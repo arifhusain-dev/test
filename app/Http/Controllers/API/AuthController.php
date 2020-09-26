@@ -93,6 +93,18 @@ class AuthController extends Controller
         $routerdata = RouterData ::whereBetween('INET_ATON(ip_address)', array($ipStart, $ipEnd)) -> get();
         return response() -> json(['success' => $routerdata], 200);
     }
+    public function updaterouter(Request $request){
+        $this -> validate($request, [
+            'sap_id' => 'required|min:18|max:18',
+            'host_name' => 'required|max:14',
+            'loopback' => 'required',
+            'mac_address' => 'required',
+        ]);
+
+        RouterData::where('loopback', $request->loopback)
+            ->update(['sap_id' => $request->sap_id],['host_name' => $request->host_name],['mac_address' => $request->mac_address]);
+        return response() -> json(['success' => 'updated router details successfully'], 200);
+    }
 
     public function listsaptype(Request $request){
         $validator = Validator ::make($request -> all(), [
