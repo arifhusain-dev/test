@@ -69,24 +69,16 @@ class AuthController extends Controller
         return response() -> json(['success' => $routerdata], 200);
     }
     public function create(Request $request){
-        $validator = Validator ::make($request -> all(), [
-            'sap_id' => 'required',
-            'host_name' => 'required',
+
+        $this -> validate($request, [
+            'sap_id' => 'required|unique:router_details|min:18|max:18',
+            'host_name' => 'required|unique:router_details|max:14',
             'loopback' => 'required',
             'mac_address' => 'required',
-            'ip_address' => 'required',
         ]);
 
         $postData = $request -> all();
-        $mac_add= $postData['mac_address'] ;
-        $sap_id= $postData['sap_id'] ;
-
-        $macdupliacte =DB::table('router_details')->where('mac_address', $mac_add)->exists();
-        $sapdupliacte =DB::table('router_details')->where('sap_id', $sap_id)->exists();
         $postData['ip_address']= $request->ip();
-        if($macdupliacte > 0 || $sapdupliacte > 0){
-            return response() -> json(['error' => "duplicate record found"], 200);
-        }
         Routerdata::create($postData);
         return response() -> json(['success' => "created successfully"], 200);
     }
